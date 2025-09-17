@@ -36,7 +36,7 @@ public class Main {
         Map<Integer, String> alunos = new HashMap<>();
         alunos.put(12,"Cauã");
         alunos.put(15,"Natan");
-        alunos.put(18,"João");
+        alunos.put(18,"João Vitor");
         System.out.println(alunos);
         System.out.println(alunos.get(15));
     }
