@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 import java.util.ArrayList;
 import java.util.List;
 

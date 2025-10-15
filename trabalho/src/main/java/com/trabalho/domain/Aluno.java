@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 public class Aluno extends Pessoa {
     private String matricula;
     private Plano plano;

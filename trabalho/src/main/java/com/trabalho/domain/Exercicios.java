@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 public class Exercicios {
     private String nomeexr;
     private String musculoAlvo;

@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 public class Funcionario extends Pessoa {
     private String cargo;
     private double salario;

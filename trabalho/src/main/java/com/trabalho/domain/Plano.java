@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 public class Plano {
     private int idPlano;
     private String descricao;

@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 public class Pagamento {
     private int idPagamento;
     private double valor;
@@ -44,7 +46,7 @@ public class Pagamento {
             }
 
             public void exibirPagamento () {
-                System.out.println("ID Pagamento: " + idPagamento);
+                System.out.println("ID com.trabalho.domain.domain.Pagamento: " + idPagamento);
                 System.out.println("Valor: " + valor);
                 System.out.println("Data do pagamento: " + data);
                 System.out.println("Status: " + status);

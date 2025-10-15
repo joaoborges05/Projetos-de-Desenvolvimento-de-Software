@@ -1,4 +1,5 @@
-import java.sql.SQLOutput;
+package com.trabalho.domain;
+
 import java.util.Date;
 
 public class Agendamento {
@@ -43,9 +44,9 @@ public class Agendamento {
     }
 
     public void exibirAgendamento() {
-        System.out.println("ID Agendamento" + idAgendamento);
+        System.out.println("ID com.trabalho.domain.domain.Agendamento" + idAgendamento);
         System.out.println("Data e Hora" + dataHora);
         System.out.println("Atividade" + atividade);
-        System.out.println("Aluno" + aluno.getNome());
+        System.out.println("com.trabalho.domain.domain.Aluno" + aluno.getNome());
     }
 }

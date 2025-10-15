@@ -1,3 +1,5 @@
+package com.trabalho.domain;
+
 public class Instrutor extends Pessoa implements Avaliacao {
     private String especialidade;
 
@@ -16,7 +18,7 @@ public class Instrutor extends Pessoa implements Avaliacao {
 
     @Override
     public void avaliarAluno() {
-        System.out.println("Instrutor " + getNome() + " está avaliando o aluno");
+        System.out.println("com.trabalho.domain.domain.Instrutor " + getNome() + " está avaliando o aluno");
 
     }
 }
