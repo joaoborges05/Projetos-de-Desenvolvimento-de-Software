@@ -1,12 +1,12 @@
 package com.trabalho.presentation;
 
 import com.trabalho.domain.*;
-import com.trabalho.domain.domain.*;
+import com.trabalho.exception.PagamentoInvalidoException;
 
 import java.util.ArrayList;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws PagamentoInvalidoException {
         ArrayList<Aluno> alunos = new ArrayList<>();
 
         Plano planoMensal = new Plano(1, "Mensal", 150.0);

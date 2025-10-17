@@ -1,5 +1,7 @@
 package com.trabalho.domain;
 
+import com.trabalho.exception.PagamentoInvalidoException;
+
 public class Pagamento {
     private int idPagamento;
     private double valor;
