@@ -1,0 +1,23 @@
+{
+  "999": {
+    "id": 999,
+    "nome": "Aluno Antigo (Persistido)",
+    "cpf": "000",
+    "matricula": "P999",
+    "plano_descricao": "Persistente"
+  },
+  "1000": {
+    "id": 1000,
+    "nome": "João",
+    "cpf": "12345678900",
+    "matricula": "001",
+    "plano_descricao": "Mensal"
+  },
+  "1001": {
+    "id": 1001,
+    "nome": "Maria",
+    "cpf": "99988877766",
+    "matricula": "002",
+    "plano_descricao": "Mensal"
+  }
+}
