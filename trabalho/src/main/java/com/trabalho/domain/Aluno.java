@@ -1,6 +1,9 @@
 package com.trabalho.domain;
 
+import java.util.Objects;
+
 public class Aluno extends Pessoa {
+    private int id;
     private String matricula;
     private Plano plano;
     private Treino treino;
@@ -9,6 +12,13 @@ public class Aluno extends Pessoa {
         this.plano = plano;
         this.matricula = matricula;
         this.treino = treino;
+    }
+
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getMatricula() {
