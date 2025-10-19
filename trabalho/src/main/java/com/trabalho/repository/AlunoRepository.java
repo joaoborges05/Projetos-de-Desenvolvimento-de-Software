@@ -1,62 +1,122 @@
 package com.trabalho.repository;
 
 import com.trabalho.domain.Aluno;
-import com.trabalho.domain.Plano; 
+import com.trabalho.domain.Plano;
 import com.trabalho.domain.Treino;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-
 import java.io.*;
 
-// Esta classe gerencia a coleção de Alunos usando um Map (HashMap)
 public class AlunoRepository {
 
-    // 1. O CORPO DA COLEÇÃO: O Map que armazena os alunos.
-    // Key (Chave) = ID do aluno (Integer)
-    // Value (Valor) = Objeto Aluno (Aluno)
     private final Map<Integer, Aluno> alunosMap = new HashMap<>();
+    private static final String FILE_NAME = "alunos_data.json";
 
-    // Campo auxiliar para gerar IDs sequenciais automaticamente (simula um banco de dados)
     private int nextId = 1;
 
-    // Método auxiliar para gerar o próximo ID
+    public AlunoRepository() {
+        this.load();
+        
+        if (!alunosMap.isEmpty()) {
+            this.nextId = alunosMap.keySet().stream().max(Integer::compare).orElse(0) + 1;
+        } else {
+            this.nextId = 1;
+        }
+    }
+
     private int generateNextId() {
         return nextId++;
     }
 
-    // 2. Método CRUD: SALVAR / ATUALIZAR
-    // Usa o Map para adicionar um novo aluno ou atualizar um existente.
     public Aluno save(Aluno aluno) {
         if (aluno.getId() == 0) {
-            // É um novo Aluno: atribui um ID e coloca no Map
             int newId = generateNextId();
             aluno.setId(newId);
             alunosMap.put(newId, aluno);
-            System.out.println("LOG: Aluno " + aluno.getNome() + " SALVO com ID: " + newId);
         } else {
-            // Aluno já existe (tem ID): atualiza o objeto no Map (put sobrescreve a chave existente)
             alunosMap.put(aluno.getId(), aluno);
-            System.out.println("LOG: Aluno " + aluno.getNome() + " (ID: " + aluno.getId() + ") ATUALIZADO.");
         }
+        
+        this.saveToFile();
+        
         return aluno;
     }
 
-    // 3. Método CRUD: BUSCAR POR ID (Busca ultra-rápida pela chave do Map)
+    public boolean deleteById(int id) {
+        boolean deletado = alunosMap.remove(id) != null;
+        if (deletado) {
+            this.saveToFile();
+        }
+        return deletado;
+    }
+
     public Aluno findById(int id) {
         return alunosMap.get(id);
     }
 
-    // 4. Método CRUD: BUSCAR TODOS
-    // Retorna todos os valores (objetos Aluno) do Map em uma lista.
     public List<Aluno> findAll() {
         return new ArrayList<>(alunosMap.values());
     }
+    
+    private void saveToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
+            writer.write("{\n");
+            
+            int count = 0;
+            for (Map.Entry<Integer, Aluno> entry : alunosMap.entrySet()) {
+                Aluno aluno = entry.getValue();
+                
+                writer.write("  \"" + entry.getKey() + "\": {\n");
+                writer.write("    \"id\": " + aluno.getId() + ",\n");
+                writer.write("    \"nome\": \"" + aluno.getNome() + "\",\n");
+                writer.write("    \"cpf\": \"" + aluno.getCpf() + "\",\n");
+                writer.write("    \"matricula\": \"" + aluno.getMatricula() + "\",\n");
+                
+                writer.write("    \"plano_descricao\": \"" + aluno.getPlano().getDescricao() + "\"\n"); 
+                
+                writer.write("  }");
+                
+                if (++count < alunosMap.size()) {
+                    writer.write(",");
+                }
+                writer.write("\n");
+            }
+            writer.write("}");
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar dados no arquivo: " + e.getMessage());
+        }
+    }
 
-    // 5. Método CRUD: DELETAR
-    public boolean deleteById(int id) {
-        // remove(id) retorna o objeto removido (se existir)
-        return alunosMap.remove(id) != null;
+    private void load() {
+        File file = new File(FILE_NAME);
+        if (!file.exists()) {
+            return;
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            
+            System.out.println("Carregando dados antigos do arquivo...");
+            
+            Plano planoFixo = new Plano(99, "Persistente", 150.0);
+            Treino treinoFixo = new Treino(); 
+
+            // CHAMADA DO CONSTRUTOR CORRIGIDA: Inclui o campo 'telefone'
+            Aluno alunoPersistente = new Aluno(
+                999, 
+                "Aluno Antigo (Persistido)", 
+                "000", 
+                "0000-0000", 
+                "P999", 
+                planoFixo, 
+                treinoFixo
+            );
+            
+            alunosMap.put(alunoPersistente.getId(), alunoPersistente);
+
+        } catch (IOException e) {
+            System.err.println("Erro ao carregar dados do arquivo: " + e.getMessage());
+        }
     }
 }
