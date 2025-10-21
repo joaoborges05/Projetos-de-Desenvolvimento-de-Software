@@ -4,7 +4,8 @@ import com.trabalho.domain.Aluno;
 import com.trabalho.domain.Plano;
 import com.trabalho.domain.Treino;
 import com.trabalho.repository.AlunoRepository;
-
+import com.trabalho.exception.RecursoNaoEncontradoException; 
+import com.trabalho.exception.ValidacaoDeDominioException; 
 import java.util.Scanner;
 import java.util.List;
 
@@ -13,12 +14,11 @@ public class AlunoView {
     private final AlunoRepository repository = new AlunoRepository();
     private final Scanner scanner = new Scanner(System.in);
 
-    // Método principal para iniciar a interface
     public void run() {
         int opcao;
         do {
             exibirMenu();
-            opcao = lerOpcao();
+            opcao = lerOpcao(); 
             processarOpcao(opcao);
         } while (opcao != 0);
         
@@ -38,102 +38,94 @@ public class AlunoView {
     }
 
     private int lerOpcao() {
+        String linha = scanner.nextLine();
         try {
-            return Integer.parseInt(scanner.nextLine());
+            return Integer.parseInt(linha.trim());
         } catch (NumberFormatException e) {
+            System.err.println("ERRO DE ENTRADA: Opção '" + linha + "' é inválida. Digite um número.");
             return -1;
         }
     }
 
     private void processarOpcao(int opcao) {
-        switch (opcao) {
-            case 1:
-                cadastrarAluno();
-                break;
-            case 2:
-                listarAlunos();
-                break;
-            case 3:
-                buscarAlunoPorId();
-                break;
-            case 4:
-                atualizarAlunoPorId();
-                break;
-            case 5:
-                deletarAlunoPorId();
-                break;
-            case 0:
-                break;
-            default:
-                System.out.println("Opção inválida. Tente novamente.");
+        try {
+            switch (opcao) {
+                case 1:
+                    cadastrarAluno();
+                    break;
+                case 2:
+                    listarAlunos();
+                    break;
+                case 3:
+                    buscarAlunoPorId();
+                    break;
+                case 4:
+                    atualizarAlunoPorId();
+                    break;
+                case 5:
+                    deletarAlunoPorId();
+                    break;
+                case 0:
+                    break;
+                case -1:
+                    break;
+                default:
+                    System.out.println("Opção inválida. Tente novamente.");
+            }
+        } catch (ValidacaoDeDominioException e) {
+            System.err.println("\n--- ERRO DE VALIDAÇÃO ---");
+            System.err.println("Falha na Operação: " + e.getMessage());
+        } catch (RecursoNaoEncontradoException e) {
+            System.err.println("\n--- ERRO DE BUSCA ---");
+            System.err.println("Status: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("\n--- ERRO INESPERADO (CRÍTICO) ---");
+            System.err.println("Ocorreu um erro interno. Detalhe: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    // Lógica REVISADA para cadastrar Aluno com entrada de Plano e Treino
     private void cadastrarAluno() {
         System.out.println("\n--- CADASTRO DE NOVO ALUNO ---");
         
         System.out.print("Nome: ");
         String nome = scanner.nextLine();
-        
         System.out.print("CPF: ");
         String cpf = scanner.nextLine();
-        
         System.out.print("Telefone: ");
         String telefone = scanner.nextLine();
-        
         System.out.print("Matrícula: ");
         String matricula = scanner.nextLine();
 
-        // ----------------------------------------------------
-        // ENTRADA PARA PLANO
-        // ----------------------------------------------------
         System.out.println("\n--- CONFIGURAÇÃO DO PLANO ---");
-        System.out.print("ID do Plano (Ex: 1): ");
         int idPlano;
-        try {
-            idPlano = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Aviso: ID inválido. Usando 1.");
-            idPlano = 1;
-        }
-
-        System.out.print("Descrição do Plano (Ex: Gold, Basic): ");
-        String descricaoPlano = scanner.nextLine();
-        
-        System.out.print("Valor Mensal (R$): ");
         double valorPlano;
+        
         try {
-            // Usa Double.parseDouble para garantir que o valor seja um número
+            System.out.print("ID do Plano (Ex: 1): ");
+            idPlano = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Descrição do Plano (Ex: Gold, Basic): ");
+            String descricaoPlano = scanner.nextLine();
+            
+            System.out.print("Valor Mensal (R$): ");
             valorPlano = Double.parseDouble(scanner.nextLine());
+            
+            Plano planoSelecionado = new Plano(idPlano, descricaoPlano, valorPlano);
+            Treino treinoSelecionado = new Treino(); 
+            
+            Aluno novoAluno = new Aluno(nome, cpf, telefone, matricula, planoSelecionado, treinoSelecionado);
+            
+            repository.save(novoAluno);
+            
+            System.out.println("\n>>> Aluno " + nome + " cadastrado com sucesso! ID: " + novoAluno.getId());
+            System.out.println(">>> Plano: " + planoSelecionado.getDescricao() + " | Valor: R$" + planoSelecionado.getValorMensal());
+
         } catch (NumberFormatException e) {
-            System.out.println("Aviso: Valor inválido. Usando R$ 150.00.");
-            valorPlano = 150.0;
-        }
-        
-        // Cria o objeto Plano usando o construtor Plano(int id, String descricao, double valor)
-        Plano planoSelecionado = new Plano(idPlano, descricaoPlano, valorPlano);
-        
-        // ----------------------------------------------------
-        // CONFIGURAÇÃO DO TREINO
-        // ----------------------------------------------------
-        // Seu Treino usa um construtor vazio, então apenas o instanciamos.
-        // A adição de Exercícios ficaria em um menu separado para não complicar o cadastro.
-        System.out.println("\n--- CONFIGURAÇÃO DO TREINO ---");
-        System.out.println("Treino criado. Você pode adicionar exercícios depois.");
-        Treino treinoSelecionado = new Treino(); 
-        
-        // Cria o novo aluno (ID será 0 inicialmente)
-        Aluno novoAluno = new Aluno(nome, cpf, telefone, matricula, planoSelecionado, treinoSelecionado);
-        
-        // Salva o aluno no Repositório (Map)
-        repository.save(novoAluno);
-        
-        System.out.println("\n>>> Aluno " + nome + " cadastrado com sucesso! ID: " + novoAluno.getId());
-        System.out.println(">>> Plano: " + planoSelecionado.getDescricao() + " | Valor: R$" + planoSelecionado.getValorMensal());
+            throw new ValidacaoDeDominioException("Erro de formato: ID ou Valor do Plano deve ser um número válido.");
+        } 
     }
 
-    // Lógica para listar todos os Alunos
     private void listarAlunos() {
         System.out.println("\n--- LISTA DE TODOS OS ALUNOS ---");
         List<Aluno> alunos = repository.findAll();
@@ -144,7 +136,6 @@ public class AlunoView {
         }
 
         for (Aluno a : alunos) {
-            // Usa o método toString() do Aluno
             System.out.println(a);
         }
     }
@@ -155,12 +146,8 @@ public class AlunoView {
         
         Aluno aluno = repository.findById(id);
         
-        if (aluno != null) {
-            System.out.println("\n>>> Aluno Encontrado:");
-            System.out.println(aluno);
-        } else {
-            System.out.println(">>> Erro: Aluno com ID " + id + " não encontrado.");
-        }
+        System.out.println("\n>>> Aluno Encontrado:");
+        System.out.println(aluno);
     }
 
     private void atualizarAlunoPorId() {
@@ -169,18 +156,12 @@ public class AlunoView {
         
         Aluno aluno = repository.findById(id);
         
-        if (aluno == null) {
-            System.out.println(">>> Erro: Aluno com ID " + id + " não encontrado.");
-            return;
-        }
-
         System.out.println(">>> Aluno Atual: " + aluno.getNome() + ". Digite o novo Telefone:");
-        // Consome a linha pendente após ler o int
         scanner.nextLine(); 
         System.out.print("Novo Telefone (Atual: " + aluno.getTelefone() + "): ");
         String novoTelefone = scanner.nextLine();
 
-        aluno.setTelefone(novoTelefone);
+        aluno.setTelefone(novoTelefone); 
         repository.save(aluno); 
         
         System.out.println(">>> Aluno " + id + " atualizado com sucesso. Novo Telefone: " + aluno.getTelefone());
@@ -190,12 +171,14 @@ public class AlunoView {
         System.out.print("Digite o ID do aluno para DELETAR: ");
         int id = lerOpcao();
         
+        repository.findById(id);
+        
         boolean deletado = repository.deleteById(id);
         
         if (deletado) {
             System.out.println(">>> Sucesso: Aluno com ID " + id + " foi deletado.");
         } else {
-            System.out.println(">>> Erro: Aluno com ID " + id + " não encontrado para exclusão.");
+             System.out.println("Aviso: Falha na exclusão, mas o aluno não foi encontrado (erro anterior).");
         }
     }
 }

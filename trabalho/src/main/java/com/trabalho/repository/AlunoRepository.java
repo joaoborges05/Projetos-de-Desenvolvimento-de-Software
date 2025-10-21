@@ -3,6 +3,8 @@ package com.trabalho.repository;
 import com.trabalho.domain.Aluno;
 import com.trabalho.domain.Plano;
 import com.trabalho.domain.Treino;
+import com.trabalho.exception.RecursoNaoEncontradoException; 
+import com.trabalho.exception.ValidacaoDeDominioException; 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -53,7 +55,11 @@ public class AlunoRepository {
     }
 
     public Aluno findById(int id) {
-        return alunosMap.get(id);
+         Aluno aluno = alunosMap.get(id);
+         if (aluno == null) {
+            throw new RecursoNaoEncontradoException("Aluno com ID " + id + " não encontrado no repositório.");
+         }
+         return aluno;
     }
 
     public List<Aluno> findAll() {
@@ -72,9 +78,14 @@ public class AlunoRepository {
                 writer.write("    \"id\": " + aluno.getId() + ",\n");
                 writer.write("    \"nome\": \"" + aluno.getNome() + "\",\n");
                 writer.write("    \"cpf\": \"" + aluno.getCpf() + "\",\n");
+                writer.write("    \"telefone\": \"" + aluno.getTelefone() + "\",\n");
                 writer.write("    \"matricula\": \"" + aluno.getMatricula() + "\",\n");
                 
-                writer.write("    \"plano_descricao\": \"" + aluno.getPlano().getDescricao() + "\"\n"); 
+                if (aluno.getPlano() != null) {
+                    writer.write("    \"plano_descricao\": \"" + aluno.getPlano().getDescricao() + "\"\n"); 
+                } else {
+                    writer.write("    \"plano_descricao\": \"N/A\"\n");
+                }
                 
                 writer.write("  }");
                 
@@ -85,7 +96,7 @@ public class AlunoRepository {
             }
             writer.write("}");
         } catch (IOException e) {
-            System.err.println("Erro ao salvar dados no arquivo: " + e.getMessage());
+            System.err.println("ERRO CRÍTICO (I/O): Falha ao salvar dados no arquivo " + FILE_NAME + ": " + e.getMessage());
         }
     }
 
@@ -102,7 +113,6 @@ public class AlunoRepository {
             Plano planoFixo = new Plano(99, "Persistente", 150.0);
             Treino treinoFixo = new Treino(); 
 
-            // CHAMADA DO CONSTRUTOR CORRIGIDA: Inclui o campo 'telefone'
             Aluno alunoPersistente = new Aluno(
                 999, 
                 "Aluno Antigo (Persistido)", 
@@ -116,7 +126,9 @@ public class AlunoRepository {
             alunosMap.put(alunoPersistente.getId(), alunoPersistente);
 
         } catch (IOException e) {
-            System.err.println("Erro ao carregar dados do arquivo: " + e.getMessage());
+            System.err.println("ERRO CRÍTICO (I/O): Falha ao carregar dados do arquivo " + FILE_NAME + ". Iniciando com dados vazios: " + e.getMessage());
+        } catch (ValidacaoDeDominioException e) {
+            System.err.println("ERRO DE DADOS: O arquivo contém dados inválidos e não pôde ser carregado. " + e.getMessage());
         }
     }
 }
