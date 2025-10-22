@@ -16,7 +16,7 @@ public class Plano {
         this.valorMensal = valorMensal;
     }
 
-    // --- Método privado para centralizar as regras de validação ---
+
     private void validarAtributos(String descricao, double valorMensal) {
         if (descricao == null || descricao.trim().isEmpty()) {
             throw new ValidacaoDeDominioException("A descrição do plano é obrigatória.");

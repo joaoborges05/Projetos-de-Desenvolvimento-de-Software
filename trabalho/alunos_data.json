@@ -6,5 +6,13 @@
     "telefone": "0000-0000",
     "matricula": "P999",
     "plano_descricao": "Persistente"
+  },
+  "1000": {
+    "id": 1000,
+    "nome": "Paulo",
+    "cpf": "11136713960",
+    "telefone": "41991936168",
+    "matricula": "4049",
+    "plano_descricao": "Gold"
   }
 }
