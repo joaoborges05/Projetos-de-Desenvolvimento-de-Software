@@ -1,6 +1,7 @@
 package com.trabalho.presentation;
 
 import com.trabalho.domain.Aluno;
+import com.trabalho.domain.Exercicios;
 import com.trabalho.domain.Plano;
 import com.trabalho.domain.Treino;
 import com.trabalho.repository.AlunoRepository;
@@ -33,6 +34,7 @@ public class AlunoView {
         System.out.println("3. Buscar Aluno por ID");
         System.out.println("4. Atualizar Aluno por ID");
         System.out.println("5. Deletar Aluno por ID");
+        System.out.println("6. Gerenciar Exercícios do Aluno");
         System.out.println("0. Sair");
         System.out.print("Escolha uma opção: ");
     }
@@ -64,6 +66,9 @@ public class AlunoView {
                     break;
                 case 5:
                     deletarAlunoPorId();
+                    break;
+                case 6:
+                    gerenciarExerciciosAluno();
                     break;
                 case 0:
                     break;
@@ -179,6 +184,70 @@ public class AlunoView {
             System.out.println(">>> Sucesso: Aluno com ID " + id + " foi deletado.");
         } else {
              System.out.println("Aviso: Falha na exclusão, mas o aluno não foi encontrado (erro anterior).");
+        }
+    }
+    private void gerenciarExerciciosAluno() {
+        System.out.println("\n=== Gerenciar Exercícios ===");
+
+        System.out.print("Digite o ID do aluno: ");
+        int idAluno = lerOpcao();
+
+        try {
+            Aluno aluno = repository.findById(idAluno);
+            Treino treino = aluno.getTreino();
+
+            while (true) {
+                System.out.println("\n--- Menu do Treino ---");
+                System.out.println("1. Adicionar exercício");
+                System.out.println("2. Listar exercícios do treino");
+                System.out.println("0. Voltar");
+                System.out.print("Escolha: ");
+
+                int opcao = lerOpcao();
+
+                switch (opcao) {
+                    case 1:
+                        adicionarExercicioAoTreino(treino);
+                        break;
+
+                    case 2:
+                        treino.listarExercicios();
+                        break;
+
+                    case 0:
+                        return;
+
+                    default:
+                        System.out.println("Opção inválida!");
+                }
+            }
+
+        } catch (RecursoNaoEncontradoException e) {
+            System.out.println("Erro: " + e.getMessage());
+        }
+    }
+
+    private void adicionarExercicioAoTreino(Treino treino) {
+        scanner.nextLine(); // limpar buffer
+
+        System.out.print("Nome do exercício: ");
+        String nome = scanner.nextLine();
+
+        System.out.print("Músculo alvo: ");
+        String musculo = scanner.nextLine();
+
+        System.out.print("Séries: ");
+        int series = lerOpcao();
+
+        System.out.print("Repetições: ");
+        int repeticoes = lerOpcao();
+
+        try {
+            Exercicios novo = new Exercicios(nome, musculo, series, repeticoes);
+            treino.adicionarExercicio(novo);
+            System.out.println("Exercício adicionado!");
+        } catch (ValidacaoDeDominioException e) {
+            System.out.println("Erro ao adicionar exercício: " + e.getMessage());
         }
     }
 }
