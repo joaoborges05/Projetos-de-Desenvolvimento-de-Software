@@ -1,18 +1,22 @@
 package com.trabalho.domain;
 
-import com.trabalho.exception.ValidacaoDeDominioException; // <-- Importação da exceção de domínio
+import com.trabalho.exception.ValidacaoDeDominioException;
 import java.util.Objects;
+import java.util.regex.Pattern; // Importação necessária para usar Pattern
 
 public class Aluno extends Pessoa {
-    
+
+    // REGEX para aceitar apenas um ou mais dígitos numéricos
+    private static final String MATRICULA_REGEX = "^\\d+$";
+
     private int id;
     private String matricula;
     private Plano plano;
     private Treino treino;
-    
+
     public Aluno(String nome, String cpf, String telefone, String matricula, Plano plano, Treino treino) {
         super(nome, cpf, telefone);
-        validarPropriedades(matricula, plano); // Chama o método de validação
+        validarPropriedades(matricula, plano);
         this.matricula = matricula;
         this.plano = plano;
         this.treino = treino;
@@ -23,21 +27,31 @@ public class Aluno extends Pessoa {
         if (id <= 0) {
             throw new ValidacaoDeDominioException("ID do aluno deve ser um valor positivo.");
         }
-        validarPropriedades(matricula, plano); // Chama o método de validação
+        validarPropriedades(matricula, plano);
         this.id = id;
         this.matricula = matricula;
         this.plano = plano;
         this.treino = treino;
     }
 
+    // --- NOVO MÉTODO DE VALIDAÇÃO DE FORMATO ---
+    private void validarMatriculaFormato(String matricula) {
+        if (!Pattern.compile(MATRICULA_REGEX).matcher(matricula).matches()) {
+            throw new ValidacaoDeDominioException("A matrícula deve conter apenas números.");
+        }
+    }
+
     private void validarPropriedades(String matricula, Plano plano) {
         if (matricula == null || matricula.trim().isEmpty()) {
             throw new ValidacaoDeDominioException("A matrícula é obrigatória.");
         }
+
+        // Aplica a nova validação de formato
+        validarMatriculaFormato(matricula);
+
         if (plano == null) {
             throw new ValidacaoDeDominioException("O aluno deve ter um Plano associado.");
         }
-    
     }
 
     public int getId() {
@@ -57,6 +71,10 @@ public class Aluno extends Pessoa {
         if (matricula == null || matricula.trim().isEmpty()) {
             throw new ValidacaoDeDominioException("A matrícula é obrigatória.");
         }
+
+        // Aplica a nova validação de formato
+        validarMatriculaFormato(matricula);
+
         this.matricula = matricula;
     }
 
@@ -74,8 +92,8 @@ public class Aluno extends Pessoa {
         return treino;
     }
     public void setTreino(Treino treino) {
-      
-        this.treino = treino; 
+
+        this.treino = treino;
     }
 
     @Override
@@ -90,13 +108,13 @@ public class Aluno extends Pessoa {
     public int hashCode() {
         return Objects.hash(id);
     }
-    
+
 
     @Override
     public String toString() {
-        return "ID: " + id + 
-               " | Nome: " + getNome() + 
-               " | Matrícula: " + matricula + 
-               " | Plano: " + (plano != null ? plano.getDescricao() : "[Sem Plano]");
+        return "ID: " + id +
+                " | Nome: " + getNome() +
+                " | Matrícula: " + matricula +
+                " | Plano: " + (plano != null ? plano.getDescricao() : "[Sem Plano]");
     }
 }
